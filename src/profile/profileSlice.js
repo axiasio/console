@@ -1,8 +1,11 @@
+import {notification} from 'antd';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {createAuth0Client} from '@auth0/auth0-spa-js';
+import {onboard, whoami} from "../api/api";
+
 
 const initialState = {
-    profile: {}
+    profile: {email: '', orgs: ['']}
 }
 
 export const profileSlice = createSlice({
@@ -12,26 +15,40 @@ export const profileSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(loadProfile.fulfilled, (state, action) => {
-                state.profile = action.payload
+                state.profile = action.payload.data
+
             })
     }
 })
 
 export const loadProfile = createAsyncThunk(
-    "load-profile",
+    "load-idp-profile",
     async () => {
         console.log("running load profile")
         let auth0Client = await createAuth0Client(
             {
                 domain: "dimssss.eu.auth0.com",
-                clientId: "uOjxgnXBdFxLEduxn1od2bTTP3KQYpDi"
+                clientId: "uOjxgnXBdFxLEduxn1od2bTTP3KQYpDi",
+                cacheLocation: 'localstorage',
+                authorizationParams: {
+                    redirect_uri: window.location.origin,
+                    audience: "http://unounds-io.test",
+                },
+
             }
         )
         let auth = await auth0Client.isAuthenticated()
+        console.log("in loadProfile:" + auth)
 
         if (auth) {
-            return await auth0Client.getUser()
+            const response = await whoami()
+            if (response.status === 200) {
+                return response.data
+            } else {
+                return await onboard();
+            }
         }
+
 
         const query = window.location.search;
 
