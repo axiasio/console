@@ -1,27 +1,13 @@
 import React from "react";
-import {Col, Divider, Layout, Row, Typography, Dropdown, Button} from "antd";
-import {UserOutlined} from "@ant-design/icons";
-import {useAuth0} from "@auth0/auth0-react";
+import {Col, Layout, Row} from "antd";
 import {Profile} from "../profile/Profile"
-
-const {Text} = Typography;
 
 
 const {Header} = Layout;
 
 
 export function AppHeader() {
-    const {loginWithRedirect, user, isAuthenticated, isLoading} = useAuth0();
-    const items = [
-        {
-            label: (
-                <a target="_blank">
-                    Switch Organization
-                </a>
-            ),
-            key: '0',
-        },
-    ];
+
 
     return (
         <Header>
